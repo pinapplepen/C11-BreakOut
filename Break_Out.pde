@@ -1,3 +1,11 @@
+//Sound
+import ddf.minim.*;
+import ddf.minim.analysis.*;
+import ddf.minim.effects.*;
+import ddf.minim.signals.*;
+import ddf.minim.spi.*;
+import ddf.minim.ugens.*;
+
 //Break Out
 //William Cheng
 //Block 1-2B
@@ -5,8 +13,16 @@
 //Arrays
 int[] x;
 int[] y;
+boolean[] alive;
 int brickd;
 int n;
+
+//Colours
+color red = #FF0000;
+color cyan = #00E3FA;
+color green = #14FA00;
+color yellow = #E8FA00;
+color pink = #FF55F7;
 
 //Mode Framework
 int mode;
@@ -25,52 +41,51 @@ int tempx, tempy;
 //Scoring
 int timer, lives, score;
 
+//Gif
+PImage[] wave;
+int frame;
+PImage background;
 
+//Font
+PFont empire;
+
+//Sounds
+Minim minim;
+AudioPlayer theme;
+AudioPlayer victory;
+AudioPlayer defeat;
+AudioPlayer bounce;
+AudioPlayer score1;
+AudioPlayer life;
 
 void setup() {
-  brickd = 50;
-  n = 28;
+  brickd = 25;
+  n = 65;
   x = new int [n];
   y = new int [n];
-  
-  //x[0] = 100;
-  //y[0] = 100;
-  
-  //x[1] = 400;
-  //y[1] = 100;
-  
-  //x[2] = 700;
-  //y[2] = 100;
-  
-  //x[3] = 100;
-  //y[3] = 200;
-  
-  //x[4] = 400;
-  //y[4] = 200;
-  
-  //x[5] = 700;
-  //y[5] = 200;
+  alive = new boolean[n];
   
   tempx = 100;
   tempy = 100; 
   
-  int i = 0;
+ 
+ int i = 0;
   while( i < n) {
       x[i] = tempx;
       y[i] = tempy;
-      tempx = tempx + 100;
+      alive[i] = true;
+      tempx = tempx + 50;
       i ++;
   
-  
     
-  if (tempx == 800) {
+  if (tempx == 750) {
      tempx = 100;
      tempy = tempy + 100;
     }
   }
   
   size(800, 800);
-  mode = GAME;
+  mode = INTRO;
   
   //initalize paddle
   paddlex = 400;
@@ -78,7 +93,7 @@ void setup() {
   //initlize ball
   ballx = 400;
   bally = 600; 
-  balld = 30;
+  balld = 15;
   
   //Initlize velocity
   vx = random(-10, 10);
@@ -92,6 +107,28 @@ void setup() {
  lives = 3;
  score = 0;
   
+ //Load gif
+ wave = new PImage[120];
+ int ip = 0;
+ while (ip < 120) {
+ wave[ip] = loadImage("giphy-gif_"+ip+"_delay-0.03s.gif");
+ ip = ip+ 1;
+ }
+ 
+ //Font
+ empire = createFont("empire.ttf", 100); 
+ 
+ //load Images
+ background = loadImage("background.jpg");
+ 
+ //Sound
+ minim = new Minim(this);
+ theme = minim.loadFile("theme.mp3");
+ victory = minim.loadFile("victory.mp3");
+ defeat = minim.loadFile("defeat.mp3");
+ bounce = minim.loadFile("bounce.wav");
+ score1 = minim.loadFile("score.wav");
+ life = minim.loadFile("life.mp3");
 }
 
 void draw() {

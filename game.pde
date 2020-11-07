@@ -3,9 +3,21 @@ background(0);
 timer = timer - 1;
 
 //Score
+fill(cyan);
 textSize(50);
-text(score, 200, 100);
-text(lives, 600, 100);
+text("Score:", 100, 600);
+text(score, 300, 600);
+text("Lives:", 480, 600);
+text(lives, 680, 600);
+
+//Gameover
+if (lives == 0) {
+  mode = GAMEOVER;
+}
+if (score == n) {
+  mode = GAMEOVER;
+}
+
 
 //Draw Paddle
 stroke(255);
@@ -18,23 +30,29 @@ circle(paddlex, 700, 100);
   
  //paddle bounce
   if (d <= 50 + balld/2 ) {
-    vx = (ballx - paddlex)/20;
-    vy = (bally - 700)/20;
+    vx = (ballx - paddlex)/10;
+    vy = (bally - 700)/10;
+    bounce.rewind();
+    bounce.play();
   }
   
 //ball
 circle(ballx, bally, balld);
   
 //Control Paddle
-if (akey == true) paddlex = paddlex - 10;
-if (dkey == true) paddlex = paddlex + 10;
+if (akey == true && paddlex > 50) paddlex = paddlex - 5;
+if (dkey == true && paddlex < 750) paddlex = paddlex + 5;
 
  //Hitting top and bottom
   if (bally < balld/2) {
       bally = balld/2;
+     bounce.rewind();  
+     bounce.play();
   }
   if (bally > 800 - balld/2 ) {
     bally = 800 - balld/2;
+    bounce.rewind();
+    bounce.play();
   }
   
   //Move Ball
@@ -43,28 +61,36 @@ if (dkey == true) paddlex = paddlex + 10;
     bally = bally + vy;
   }
   
-  //Scoring
+  //Losing Lives
   if (bally > 800 - balld/2) {
-  timer = 100;
+  timer = 150;
   lives = lives - 1;
   ballx = 400;
   bally = 600;
+  life.rewind();
+  life.play();
   }
   
    //Bounce off walls
    //Top
    if (bally <= balld/2){
     vy = vy * -1;
+    bounce.rewind();
+    bounce.play();
    }
    
    //Left 
    if (ballx <= balld/2) {
    vx = vx * -1;
+    bounce.rewind();
+    bounce.play();
    }
    
    //Right
    if (ballx >= width - balld/2) {
    vx = vx * -1;
+   bounce.rewind();
+   bounce.play();
    }
    
    //Bricks
@@ -74,22 +100,26 @@ if (dkey == true) paddlex = paddlex + 10;
    
    int i = 0;
    while (i < n) {
-   if (y[i] == 100) fill(250, 0, 0);
-   if (y[i] == 200) fill(0, 227, 250);
-   if (y[i] == 300) fill(20, 250, 0);
-   if (y[i] == 400) fill(232, 250, 0);
-   circle(x[i], y[i], brickd);
-   if (dist(ballx, bally, x[i], y[i]) < balld/2 + brickd/2) {
-     vx = (ballx - x[i])/10;
-     vy = (bally - y[i])/10;
-   }
-   i = i + 1;
+     if (alive[i] == true){
+   manageBrick(i);
+     }
+   i++;
    }
 }
 
 
 
 void gameClicks(){
+  mode = PAUSE;
   
-  
+}
+
+void gameKBP() {
+  if (key == 'a' || key == 'A') akey = true;
+  if (key == 'd' || key == 'D') dkey = true;
+}
+
+void gameKBR() {
+  if (key == 'a' || key == 'A') akey = false;
+  if (key == 'd' || key == 'D') dkey = false;
 }
